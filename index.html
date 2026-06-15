@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="UTF-8">
-  <title>Magic Video Frame</title>
+  <title>SnapAndWrap Magic Frame</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -16,244 +16,270 @@
     a-scene{position:fixed!important;top:0;left:0;width:100%!important;height:100%!important}
     
     #loading, #start-screen, #err {
-      position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;background:#0d0d13;color:#fff;padding:2rem;text-align:center
+      position:fixed;inset:0;z-index:9999;background:#07070f;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:2rem;transition:opacity .5s
     }
-    #start-screen {
-      background:linear-gradient(135deg, #0f172a 0%, #020617 100%);
-    }
-    .brand {
-      font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;
-      background:linear-gradient(45deg, #10b981, #059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      margin-bottom:0.5rem;letter-spacing:-1px
-    }
-    .tagline{font-size:1rem;color:#94a3b8;margin-bottom:2.5rem}
-    .btn {
-      background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;border:none;
-      padding:1rem 2.5rem;font-size:1.1rem;font-weight:600;border-radius:50px;cursor:pointer;
-      box-shadow:0 10px 25px rgba(16,185,129,0.3);transition:all 0.3s ease;font-family:'DM Sans',sans-serif
-    }
-    .btn:active{transform:scale(0.96);box-shadow:0 5px 10px rgba(16,185,129,0.2)}
+    #loading.hide{opacity:0;pointer-events:none}
     
-    #brand-corner {
-      position:fixed;top:1.2rem;left:1.2rem;z-index:90;display:none;
-      font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;
-      background:rgba(15,23,42,0.6);padding:0.4rem 1rem;border-radius:20px;backdrop-filter:blur(10px)
+    #start-screen { display:none; z-index:10000; }
+    #start-btn {
+      padding:16px 36px; border-radius:30px; border:none; margin-top:20px;
+      background:linear-gradient(135deg,#7c5cfc,#fc5c7d); color:#fff;
+      font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700;
+      cursor:pointer; box-shadow:0 6px 24px rgba(124,92,252,.4);
+      animation: pulseBtn 2s infinite;
     }
-    #brand-corner span {
-      background:linear-gradient(45deg, #10b981, #059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    }
+    @keyframes pulseBtn{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+    .brand{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;
+      background:linear-gradient(135deg,#7c5cfc,#fc5c7d);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+    .tag{font-size:0.78rem;color:#6b6b82;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2rem}
+    .spin{width:44px;height:44px;border:3px solid #22223a;border-top-color:#7c5cfc;
+      border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 1rem}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    #load-txt{font-size:0.85rem;color:#6b6b82}
     
-    #hint {
-      position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);z-index:90;
-      color:#fff;background:rgba(15,23,42,0.7);padding:0.8rem 1.6rem;border-radius:50px;
-      font-size:0.9rem;font-weight:500;pointer-events:none;transition:opacity 0.4s ease;
-      display:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1)
+    #err{display:none;color:#f0f0f8;z-index:10001;}
+    #err.show{display:flex}
+    #err-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:8px}
+    #err-msg{font-size:0.88rem;color:#6b6b82;line-height:1.7;max-width:300px}
+
+    #brand-corner{
+      position:fixed;top:1rem;left:1rem;z-index:100;
+      font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;
+      background:linear-gradient(135deg,#7c5cfc,#fc5c7d);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      display:none;pointer-events:none
     }
-    
-    #banner {
-      position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);z-index:100;
-      background:rgba(16,185,129,0.9);color:#fff;padding:0.8rem 2rem;border-radius:50px;
-      font-weight:600;font-size:1.1rem;display:none;box-shadow:0 10px 30px rgba(0,0,0,0.5);
-      animation:pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);backdrop-filter:blur(5px)
+    #hint{
+      position:fixed;bottom:0;left:0;right:0;z-index:100;
+      padding:2rem 1.5rem;text-align:center;
+      background:linear-gradient(transparent,rgba(0,0,0,.8));
+      display:none;pointer-events:none; transition:opacity 0.3s;
     }
-    @keyframes pop{0%{transform:translate(-50%,-50%) scale(0.7);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
-    
-    .spinner {
-      width:45px;height:45px;border:4px solid rgba(16,185,129,0.1);border-left-color:#10b981;
-      border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1.5rem
+    .pulse{width:54px;height:54px;border:2px solid rgba(124,92,252,.7);
+      border-radius:50%;margin:0 auto 12px;animation:pulse 1.6s ease-out infinite}
+    @keyframes pulse{0%{transform:scale(1);opacity:1}100%{transform:scale(1.7);opacity:0}}
+    .h1{font-size:0.9rem;color:rgba(255,255,255,.85);font-weight:500;margin-bottom:4px}
+    .h2{font-size:0.75rem;color:rgba(255,255,255,.45)}
+    #banner{
+      position:fixed;top:1rem;left:50%;transform:translateX(-50%);
+      background:linear-gradient(135deg,#7c5cfc,#fc5c7d);
+      padding:8px 22px;border-radius:30px;font-size:0.82rem;
+      font-weight:600;z-index:100;display:none;color:#fff;
+      white-space:nowrap;box-shadow:0 4px 24px rgba(124,92,252,.5)
     }
-    @keyframes spin{100%{transform:rotate(360deg)}}
-    .hide{opacity:0;transition:opacity 0.5s ease;pointer-events:none}
   </style>
+
   <script>
     AFRAME.registerComponent('video-cover', {
-      init: function () {
-        this.el.addEventListener('materialtextureloaded', () => {
-          this.updateAspect();
+      init: function() {
+        this.el.addEventListener('materialtextureloaded', e => {
+          const tex = e.detail.texture;
+          const vid = e.detail.src;
+          const updateUV = () => {
+            const planeW = parseFloat(this.el.getAttribute('width')) || 1;
+            const planeH = parseFloat(this.el.getAttribute('height')) || 1;
+            const planeAspect = planeW / planeH;
+            const videoAspect = vid.videoWidth / vid.videoHeight;
+
+            if (videoAspect > planeAspect) {
+              const repeatX = planeAspect / videoAspect;
+              tex.repeat.set(repeatX, 1);
+              tex.offset.set((1 - repeatX) / 2, 0);
+            } else {
+              const repeatY = videoAspect / planeAspect;
+              tex.repeat.set(1, repeatY);
+              tex.offset.set(0, (1 - repeatY) / 2);
+            }
+          };
+          if (vid.videoWidth > 0) updateUV();
+          else vid.addEventListener('loadedmetadata', updateUV);
         });
-      },
-      updateAspect: function () {
-        const mesh = this.el.getObject3D('mesh');
-        if (!mesh || !mesh.material || !mesh.material.map) return;
-        
-        const img = mesh.material.map.image;
-        if (!img) return;
-
-        const videoW = img.videoWidth || img.width;
-        const videoH = img.videoHeight || img.height;
-        if (!videoW || !videoH) return;
-
-        const planeW = parseFloat(this.el.getAttribute('width') || 1);
-        const planeH = parseFloat(this.el.getAttribute('height') || 1);
-
-        const videoAspect = videoW / videoH;
-        const planeAspect = planeW / planeH;
-
-        mesh.material.map.matrixAutoUpdate = false;
-        mesh.material.map.generateMipmaps = false;
-        mesh.material.map.minFilter = THREE.LinearFilter;
-
-        if (videoAspect > planeAspect) {
-          const repeatX = planeAspect / videoAspect;
-          mesh.material.map.repeat.set(repeatX, 1);
-          mesh.material.map.offset.set((1 - repeatX) / 2, 0);
-        } else {
-          const repeatY = videoAspect / planeAspect;
-          mesh.material.map.repeat.set(1, repeatY);
-          mesh.material.map.offset.set(0, (1 - repeatY) / 2);
-        }
       }
     });
   </script>
 </head>
 <body>
 
-  <div id="err" style="display:none;">
-    <div class="brand">Magic Frame</div>
-    <p id="err-txt" style="color:#ef4444;font-weight:500;"></p>
-  </div>
+<div id="loading">
+  <div class="brand">SnapAndWrap</div>
+  <div class="tag">Magic Video Frame</div>
+  <div class="spin"></div>
+  <div id="load-txt">Loading your magic frame...</div>
+</div>
 
-  <div id="loading">
-    <div class="spinner"></div>
-    <div class="brand" style="font-size:1.8rem">Magic Video Frame</div>
-    <p style="color:#64748b;font-size:0.95rem">Preparing your interactive AR experience...</p>
-  </div>
+<div id="start-screen">
+  <div class="brand">SnapAndWrap</div>
+  <div class="tag">Ready to Experience</div>
+  <div style="color:#6b6b82; font-size: 0.9rem; margin-bottom:10px;">Turn your volume up!</div>
+  <button id="start-btn">Tap to Start AR ✨</button>
+</div>
 
-  <div id="start-screen" style="display:none;">
-    <div class="brand">Magic Video Frame</div>
-    <p class="tagline">Scan your physical frame to unlock the memory</p>
-    <button class="btn" onclick="startAR()">Reveal Magic</button>
-  </div>
+<div id="err">
+  <div style="font-size:3rem;margin-bottom:1rem">😕</div>
+  <div id="err-title">Something went wrong</div>
+  <div id="err-msg">Please try again.</div>
+</div>
 
-  <div id="brand-corner"><span>Magic</span> Frame</div>
-  <div id="banner">✨ Memory Unlocked</div>
-  <div id="hint">Point camera at your physical photo</div>
+<div id="brand-corner">SnapAndWrap ✨</div>
+<div id="banner">✨ Frame detected!</div>
+<div id="hint">
+  <div class="pulse"></div>
+  <div class="h1">Point camera at your photo frame</div>
+  <div class="h2">Keep frame fully visible • Hold steady</div>
+</div>
 
-  <script>
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+<script>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    function getParam(p){
-      return new URLSearchParams(window.location.search).get(p);
-    }
+const params = new URLSearchParams(window.location.search);
+const orderId = params.get('order');
 
-    const orderId = getParam('order');
-    if(!orderId) {
-      showErr("Invalid Link. Please use a valid QR code link containing an order ID.");
+const globalVideo = document.createElement('video');
+globalVideo.id = 'snap-video';
+globalVideo.setAttribute('playsinline', '');
+globalVideo.setAttribute('webkit-playsinline', '');
+globalVideo.setAttribute('crossorigin', 'anonymous');
+globalVideo.loop = true;
+
+let targetPlaneHeight = 1;
+let mindURLStr = "";
+
+function setTxt(t) { document.getElementById('load-txt').textContent = t; }
+function showErr(title, msg) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('err').classList.add('show');
+  document.getElementById('err-title').textContent = title;
+  document.getElementById('err-msg').textContent = msg;
+}
+
+function b64ToBlob(b64, mime) {
+  const raw = b64.includes(',') ? b64.split(',')[1] : b64;
+  const bin = atob(raw);
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return new Blob([buf], { type: mime });
+}
+
+async function init() {
+  if(!orderId) { showErr('Invalid Link', 'No order ID found. Use the QR code from SnapAndWrap.'); return; }
+  setTxt('Finding your order...');
+  
+  try {
+    const snap = await db.ref('orders/' + orderId).get();
+    if(!snap.exists()) { showErr('Order Not Found', 'Order "' + orderId + '" not found. Contact SnapAndWrap.'); return; }
+    
+    const data = snap.val();
+    db.ref('orders/' + orderId + '/scanCount').transaction(c => (c || 0) + 1);
+    
+    if(!data.mindFileData) { showErr('AR Not Ready', 'AR tracker missing. Contact SnapAndWrap.'); return; }
+    if(!data.videoURL) { showErr('Video Missing', 'Video not found. Contact SnapAndWrap.'); return; }
+
+    globalVideo.src = data.videoURL;
+    globalVideo.load();
+
+    setTxt('Preparing AR assets...');
+    const mindBlob = b64ToBlob(data.mindFileData, 'application/octet-stream');
+    mindURLStr = URL.createObjectURL(mindBlob);
+
+    if (data.frameURL) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        targetPlaneHeight = img.height / img.width;
+        showStartScreen();
+      };
+      img.onerror = () => { showStartScreen(); };
+      img.src = data.frameURL;
     } else {
-      db.ref('orders/' + orderId).once('value').then(snapshot => {
-        const data = snapshot.val();
-        if(!data) {
-          showErr("Order not found. Please verify your order ID.");
-          return;
-        }
-        if(!data.mindURL || !data.videoURL) {
-          showErr("AR configuration missing for this order. Please complete setup in the dashboard.");
-          return;
-        }
-        initAR(data);
-      }).catch(e => {
-        showErr("Database connection error. Please refresh and try again.");
-      });
+      showStartScreen();
     }
+  } catch(e) {
+    showErr('Error', e.message); console.error(e);
+  }
+}
 
-    function showErr(msg) {
+function showStartScreen() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'flex';
+}
+
+document.getElementById('start-btn').addEventListener('click', () => {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('loading').style.display = 'flex';
+  setTxt('Starting camera...');
+
+  globalVideo.muted = false;
+  globalVideo.play().then(() => {
+    globalVideo.pause();
+    buildScene();
+  }).catch(e => {
+    buildScene();
+  });
+});
+
+function buildScene() {
+  const scene = document.createElement('a-scene');
+  scene.id = 'ar-scene';
+  scene.setAttribute('mindar-image', 'imageTargetSrc:' + mindURLStr + '; autoStart:true; uiLoading:no; uiError:no; uiScanning:no;');
+  scene.setAttribute('color-space', 'sRGB');
+  scene.setAttribute('renderer', 'colorManagement:true; physicallyCorrectLights:true;');
+  scene.setAttribute('vr-mode-ui', 'enabled:false');
+  scene.setAttribute('device-orientation-permission-ui', 'enabled:false');
+
+  const assets = document.createElement('a-assets');
+  assets.appendChild(globalVideo);
+  scene.appendChild(assets);
+
+  const camera = document.createElement('a-camera');
+  camera.setAttribute('position', '0 0 0');
+  camera.setAttribute('look-controls', 'enabled: false');
+  scene.appendChild(camera);
+
+  const targetEntity = document.createElement('a-entity');
+  targetEntity.setAttribute('mindar-image-target', 'targetIndex: 0');
+  
+  const plane = document.createElement('a-plane');
+  plane.setAttribute('position', '0 0 0.001');
+  plane.setAttribute('width', '1');
+  plane.setAttribute('height', targetPlaneHeight.toString());
+  plane.setAttribute('material', 'src: #snap-video; shader: flat; transparent: true');
+  plane.setAttribute('video-cover', '');
+
+  targetEntity.appendChild(plane);
+  scene.appendChild(targetEntity);
+
+  document.body.appendChild(scene);
+
+  scene.addEventListener('arReady', () => {
+    document.getElementById('loading').classList.add('hide');
+    setTimeout(() => {
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('err-txt').textContent = msg;
-      document.getElementById('err').style.display = 'flex';
-    }
+      document.getElementById('brand-corner').style.display = 'block';
+      document.getElementById('hint').style.display = 'block';
+    }, 500);
+  });
 
-    let globalMindURL = '';
-    let globalVideoURL = '';
-    let targetPlaneHeight = 1;
+  scene.addEventListener('targetFound', () => {
+    document.getElementById('hint').style.opacity = '0';
+    const b = document.getElementById('banner');
+    b.style.display = 'block';
+    setTimeout(() => b.style.display = 'none', 2500);
+    globalVideo.play().catch(e => console.log('Play error:', e));
+  });
 
-    function initAR(data) {
-      globalMindURL = data.mindURL;
-      globalVideoURL = data.videoURL;
-      targetPlaneHeight = data.targetHeight ? parseFloat(data.targetHeight) : 1;
+  scene.addEventListener('targetLost', () => {
+    document.getElementById('hint').style.opacity = '1';
+    globalVideo.pause();
+  });
+}
 
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('start-screen').style.display = 'flex';
-    }
-
-    function startAR() {
-      document.getElementById('start-screen').style.display = 'none';
-      document.getElementById('loading').style.display = 'flex';
-
-      const assets = document.createElement('a-assets');
-      
-      const video = document.createElement('video');
-      video.setAttribute('id', 'snap-video');
-      video.setAttribute('src', globalVideoURL);
-      video.setAttribute('crossorigin', 'anonymous');
-      video.setAttribute('loop', 'true');
-      video.setAttribute('playsinline', 'true');
-      video.setAttribute('webkit-playsinline', 'true');
-      
-      assets.appendChild(video);
-      document.body.appendChild(assets);
-
-      const globalVideo = document.getElementById('snap-video');
-      globalVideo.load();
-
-      const scene = document.createElement('a-scene');
-      scene.setAttribute('mindar-image', `imageTargetSrc: ${globalMindURL}; autoStart: true; filterMinCF:0.0001; filterBeta:0.001;`);
-      scene.setAttribute('embedded', 'true');
-      scene.setAttribute('color-space', 'sRGB');
-      scene.setAttribute('renderer', 'colorManagement: true, physicallyCorrectLights: false');
-      scene.setAttribute('vr-mode-ui', 'enabled: false');
-      scene.setAttribute('device-orientation-permission-ui', 'enabled: false');
-
-      const camera = document.createElement('a-camera');
-      camera.setAttribute('position', '0 0 0');
-      camera.setAttribute('look-controls', 'enabled: false');
-      scene.appendChild(camera);
-
-      const targetEntity = document.createElement('a-entity');
-      targetEntity.setAttribute('mindar-image-target', 'targetIndex: 0');
-
-      const plane = document.createElement('a-plane');
-      plane.setAttribute('position', '0 0 0.001');
-      plane.setAttribute('width', '1');
-      plane.setAttribute('height', targetPlaneHeight.toString());
-      plane.setAttribute('material', 'src: #snap-video; shader: flat; transparent: true');
-      plane.setAttribute('video-cover', ''); 
-
-      targetEntity.appendChild(plane);
-      scene.appendChild(targetEntity);
-      document.body.appendChild(scene);
-
-      scene.addEventListener('arReady', () => {
-        document.getElementById('loading').classList.add('hide');
-        setTimeout(() => {
-          document.getElementById('loading').style.style.display = 'none';
-          document.getElementById('brand-corner').style.display = 'block';
-          document.getElementById('hint').style.display = 'block';
-        }, 500);
-      });
-
-      scene.addEventListener('targetFound', () => {
-        document.getElementById('hint').style.opacity = '0';
-        const b = document.getElementById('banner');
-        b.style.display = 'block';
-        setTimeout(() => b.style.display = 'none', 2500);
-
-        globalVideo.play().catch(e => console.log('Play error:', e));
-        
-        db.ref('orders/' + orderId).transaction(currentData => {
-          if (currentData) {
-            currentData.scanCount = (currentData.scanCount || 0) + 1;
-          }
-          return currentData;
-        });
-      });
-
-      scene.addEventListener('targetLost', () => {
-        document.getElementById('hint').style.opacity = '1';
-        globalVideo.pause();
-      });
-    } 
-  </script>
+init();
+</script>
 </body>
-</html> 
+</html>
