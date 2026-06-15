@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Magic Video Frame Admin</title>
+<title>SnapAndWrap Admin</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="firebase-config.js"></script>
@@ -13,268 +13,314 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0f;color:#f0f0f8;font-family:'DM Sans',sans-serif;min-height:100vh}
 header{padding:1.2rem 2rem;border-bottom:1px solid #2a2a38;display:flex;align-items:center;justify-content:space-between;background:#13131a}
-.logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(45deg,#10b981,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.container{max-width:1200px;margin:2rem auto;padding:0 1.5rem;display:grid;grid-template-columns:1fr;gap:2rem}
-.card{background:#13131a;border:1px solid #2a2a38;border-radius:16px;padding:2rem;position:relative;overflow:hidden}
-h2{font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1rem}
-.stat-box{background:#1a1a24;padding:1.2rem;border-radius:12px;border:1px solid #2a2a32;text-align:center}
-.stat-box span{display:block;font-size:.85rem;color:#94a3b8;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:0.5px}
-.stat-box b{font-size:1.8rem;font-family:'Syne',sans-serif;color:#10b981}
-.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem}
-@media(max-width:768px){.form-grid{grid-template-columns:1fr}}
-.input-group{display:flex;flex-direction:column;gap:.5rem}
-label{font-size:.88rem;color:#94a3b8;font-weight:500}
-input,select{background:#1a1a24;border:1px solid #2a2a38;padding:.85rem 1rem;border-radius:10px;color:#fff;font-family:inherit;font-size:.95rem;transition:all .2s}
-input:focus,select:focus{outline:none;border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,0.15)}
-.file-wrapper{position:relative;background:#1a1a24;border:2px dashed #3a3a4c;border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:.5rem}
-.file-wrapper:hover{border-color:#10b981;background:#1d2422}
-.file-wrapper input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
-.file-info{font-size:.82rem;color:#808093;word-break:break-all}
-.btn{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;border:none;padding:.9rem 2rem;font-size:1rem;font-weight:600;border-radius:10px;cursor:pointer;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;box-shadow:0 4px 12px rgba(16,185,129,0.2)}
-.btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(16,185,129,0.3)}
-.btn:disabled{background:#2e2e3a;color:#707085;cursor:not-allowed;transform:none;box-shadow:none}
-.htable{width:100%;border-collapse:collapse;margin-top:1rem;text-align:left}
-.htable th{padding:1rem;color:#94a3b8;font-size:.85rem;text-transform:uppercase;border-bottom:2px solid #2a2a38;font-weight:600}
-.htable td{padding:1.2rem 1rem;border-bottom:1px solid #1f1f2a;font-size:.95rem;vertical-align:middle}
-.htable tr:hover td{background:#161622}
-.action-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e8;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.82rem;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center}
-.action-btn:hover{background:#10b981;border-color:#10b981;color:#fff}
-.modal{position:fixed;inset:0;background:rgba(5,5,8,0.85);backdrop-filter:blur(6px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1.5rem}
-.modal-card{background:#13131a;border:1px solid #2a2a38;border-radius:20px;max-width:440px;width:100%;padding:2rem;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.5);position:relative}
-.close-modal{position:absolute;top:1rem;right:1rem;background:none;border:none;color:#808093;font-size:1.5rem;cursor:pointer}
-#qrcode{display:inline-block;padding:1rem;background:#fff;border-radius:12px;margin:1.5rem 0}
-#qrcode img{margin:0 auto}
-.m-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700}
-.empty{text-align:center;padding:3rem 1rem;color:#6b6b82;font-size:.95rem}
-.progress-bar{width:100%;height:6px;background:#1a1a24;border-radius:3px;margin-top:.8rem;overflow:hidden;display:none}
-.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#10b981,#34d399);transition:width .1s ease}
+.logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,#7c5cfc,#fc5c7d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo small{font-size:0.7rem;font-family:'DM Sans',sans-serif;font-weight:400;-webkit-text-fill-color:#6b6b82;display:block}
+.stats{display:flex;gap:1.5rem;text-align:right}
+.snum{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;color:#7c5cfc}
+.slbl{font-size:0.7rem;color:#6b6b82;text-transform:uppercase}
+.wrap{max-width:1100px;margin:0 auto;padding:2rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.card{background:#13131a;border:1px solid #2a2a38;border-radius:16px;padding:1.5rem}
+.ctitle{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:1.2rem;padding-left:10px;border-left:4px solid #7c5cfc}
+.lbl{font-size:0.78rem;color:#6b6b82;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:5px}
+.inp{width:100%;padding:10px 14px;background:#1c1c26;border:1px solid #2a2a38;border-radius:10px;color:#f0f0f8;font-size:0.9rem;outline:none;margin-bottom:1rem;font-family:'DM Sans',sans-serif}
+.inp:focus{border-color:#7c5cfc}
+
+.fgroup{margin-bottom:1rem}
+.fgroup .lbl{margin-bottom:6px}
+.frow{display:flex;align-items:center;gap:8px;background:#1c1c26;border:1px solid #2a2a38;border-radius:10px;padding:8px 12px}
+.frow.done{border-color:#22c55e}
+.ficon{font-size:1.3rem;flex-shrink:0}
+.fname{flex:1;font-size:0.82rem;color:#6b6b82;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fname.ok{color:#22c55e}
+.finput{
+  padding:5px 12px;border-radius:8px;border:1px solid #7c5cfc;
+  background:transparent;color:#7c5cfc;font-size:0.75rem;
+  cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;
+  width:auto;
+}
+.finput::file-selector-button{
+  padding:4px 10px;border-radius:6px;border:none;
+  background:linear-gradient(135deg,#7c5cfc,#fc5c7d);
+  color:#fff;font-size:0.75rem;cursor:pointer;
+  font-family:'DM Sans',sans-serif;margin-right:6px;
+}
+.finput::-webkit-file-upload-button{
+  padding:4px 10px;border-radius:6px;border:none;
+  background:linear-gradient(135deg,#7c5cfc,#fc5c7d);
+  color:#fff;font-size:0.75rem;cursor:pointer;
+  font-family:'DM Sans',sans-serif;margin-right:6px;
+}
+
+.pbar{display:none;margin-bottom:1rem}
+.plbl{font-size:0.75rem;color:#6b6b82;margin-bottom:5px}
+.pbg{height:6px;background:#2a2a38;border-radius:3px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,#7c5cfc,#fc5c7d);width:0%;transition:width .3s;border-radius:3px}
+
+.sbtn{width:100%;padding:13px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#7c5cfc,#fc5c7d);color:#fff;box-shadow:0 4px 20px rgba(124,92,252,.3)}
+.sbtn:disabled{opacity:.4;cursor:not-allowed}
+.smsg{padding:10px 14px;border-radius:10px;font-size:0.85rem;margin-top:10px;display:none}
+.smsg.ok{background:#052e16;color:#22c55e;border:1px solid #166534}
+.smsg.err{background:#2d0a0a;color:#f87171;border:1px solid #7f1d1d}
+.smsg.ld{background:#1a1228;color:#7c5cfc;border:1px solid #3b1f6e}
+
+.htable{width:100%;border-collapse:collapse;font-size:0.83rem}
+.htable th{padding:9px 12px;text-align:left;color:#6b6b82;font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid #2a2a38;font-weight:500}
+.htable td{padding:11px 12px;border-bottom:1px solid #2a2a38;vertical-align:middle}
+.htable tr:last-child td{border-bottom:none}
+.htable tr:hover td{background:#1c1c26}
+.qbtn{padding:5px 10px;border-radius:8px;border:1px solid #7c5cfc;background:transparent;color:#7c5cfc;font-size:0.75rem;cursor:pointer;font-family:'DM Sans',sans-serif}
+.dbtn{padding:4px 9px;border-radius:8px;border:1px solid #7f1d1d;background:transparent;color:#f87171;font-size:0.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:4px}
+.empty{text-align:center;padding:2.5rem;color:#6b6b82;font-size:0.88rem}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.mbox{background:#13131a;border:1px solid #2a2a38;border-radius:20px;padding:2rem;text-align:center;max-width:320px;width:90%}
+.mtitle{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:4px}
+.msub{font-size:0.78rem;color:#6b6b82;margin-bottom:1.2rem}
+#qrc{margin:0 auto 1rem;background:#fff;padding:12px;border-radius:12px;display:inline-block}
+.mlink{font-size:0.7rem;color:#7c5cfc;word-break:break-all;background:#1c1c26;padding:7px 10px;border-radius:8px;margin-bottom:10px;cursor:pointer;border:1px solid #2a2a38;display:block}
+.mcls{padding:8px 20px;border-radius:10px;border:1px solid #2a2a38;background:transparent;color:#6b6b82;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;margin-top:6px}
+
+.howto{background:#1c1c26;border:1px solid #2a2a38;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.5rem}
+.howto-title{font-size:0.82rem;font-weight:600;color:#7c5cfc;margin-bottom:8px}
+.howto-step{font-size:0.8rem;color:#6b6b82;margin-bottom:5px;padding-left:1rem;position:relative;line-height:1.5}
+.howto-step::before{content:counter(step);counter-increment:step;position:absolute;left:0;color:#7c5cfc;font-weight:700}
+.howto{counter-reset:step}
+a.hlink{color:#7c5cfc;text-decoration:none;font-weight:600}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="logo">MAGIC VIDEO FRAME</div>
-  <div style="font-size:.88rem;color:#94a3b8;font-weight:500;">Management Terminal</div>
+  <div class="logo">SnapAndWrap <small>Admin Dashboard</small></div>
+  <div class="stats">
+    <div><div class="snum" id="total-orders">0</div><div class="slbl">Orders</div></div>
+    <div><div class="snum" id="total-scans">0</div><div class="slbl">Scans</div></div>
+  </div>
 </header>
 
-<div class="container">
-  <div class="card">
-    <div class="stats-grid">
-      <div class="stat-box"><span>Active Frames</span><b id="total-orders">0</b></div>
-      <div class="stat-box"><span>Total Scans</span><b id="total-scans">0</b></div>
+<div class="wrap">
+  <div class="howto">
+    <div class="howto-title">📋 How to add each order</div>
+    <div class="howto-step">Go to <a class="hlink" href="https://hiukim.github.io/mind-ar-js-doc/tools/compile" target="_blank">MindAR Compiler ↗</a> → upload frame photo → download .mind file</div>
+    <div class="howto-step">Fill form below → select frame photo + .mind file + video → click Add Order</div>
+    <div class="howto-step">QR generated → screenshot → send to customer via WhatsApp</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="ctitle">Add New Order</div>
+
+      <span class="lbl">Customer Name</span>
+      <input class="inp" type="text" id="f-name" placeholder="e.g. Priya Sharma">
+
+      <span class="lbl">Phone Number</span>
+      <input class="inp" type="tel" id="f-phone" placeholder="e.g. 9876543210">
+
+      <span class="lbl">Order ID</span>
+      <input class="inp" type="text" id="f-oid" readonly style="color:#6b6b82">
+
+      <div class="fgroup">
+        <span class="lbl">Frame Photo (JPG/PNG)</span>
+        <div class="frow" id="frame-row">
+          <span class="ficon">🖼️</span>
+          <span class="fname" id="frame-lbl">No file chosen</span>
+          <input class="finput" type="file" id="frame-file" accept="image/*" onchange="onFile(this,'frame')">
+        </div>
+      </div>
+
+      <div class="fgroup">
+        <span class="lbl">.mind File (AR Tracker)</span>
+        <div class="frow" id="mind-row">
+          <span class="ficon">🧠</span>
+          <span class="fname" id="mind-lbl">No file chosen</span>
+          <input class="finput" type="file" id="mind-file" accept=".mind,application/octet-stream" onchange="onFile(this,'mind')">
+        </div>
+      </div>
+
+      <div class="fgroup">
+        <span class="lbl">Customer Video (MP4)</span>
+        <div class="frow" id="video-row">
+          <span class="ficon">🎬</span>
+          <span class="fname" id="video-lbl">No file chosen</span>
+          <input class="finput" type="file" id="video-file" accept="video/*" onchange="onFile(this,'video')">
+        </div>
+      </div>
+
+      <div class="pbar" id="pbar">
+        <div class="plbl" id="plbl">Uploading...</div>
+        <div class="pbg"><div class="pfill" id="pfill"></div></div>
+      </div>
+
+      <button class="sbtn" id="sbtn" onclick="submitOrder()">✨ Add Order & Generate QR</button>
+      <div class="smsg" id="smsg"></div>
     </div>
-  </div>
 
-  <div class="card">
-    <h2>✨ Create New Interactive Frame</h2>
-    <form id="orderForm" onsubmit="handleCreateOrder(event)">
-      <div class="form-grid">
-        <div class="input-group">
-          <label>Customer Name</label>
-          <input type="text" id="cName" required placeholder="John Doe">
-        </div>
-        <div class="input-group">
-          <label>Phone Number / Remarks</label>
-          <input type="text" id="cPhone" placeholder="+91 98765 43210">
-        </div>
-        <div class="input-group">
-          <label>Target Photo Aspect Ratio</label>
-          <select id="aspectRatio" onchange="handleAspectChange()">
-            <option value="1">Square (1:1)</option>
-            <option value="1.414">Standard Portrait (1:1.41) / A4</option>
-            <option value="0.707">Standard Landscape (1:0.71)</option>
-            <option value="1.5">Classic Photo (4x6 Portrait - 1:1.5)</option>
-            <option value="0.666">Classic Photo (6x4 Landscape - 1:0.66)</option>
-            <option value="custom">Custom Dimensions</option>
-          </select>
-        </div>
-        <div class="input-group" id="customDim" style="display:none">
-          <label>Custom Aspect Ratio (Height divided by Width)</label>
-          <input type="number" id="cHeight" step="0.01" value="1.00" placeholder="e.g. 1.33 for 3:4 portrait">
-        </div>
-      </div>
-
-      <div style="margin-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-        <div class="input-group">
-          <label>Physical Tracking Image (.jpg or .png)</label>
-          <div class="file-wrapper">
-            <span style="font-size:.9rem;font-weight:500;color:#10b981">Choose Target Photo</span>
-            <span class="file-info" id="p-info">No file chosen</span>
-            <input type="file" id="photoFile" accept="image/jpeg,image/png" required onchange="document.getElementById('p-info').textContent=this.files[0]?this.files[0].name:'No file chosen'">
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label>Overlay Video (.mp4)</label>
-          <div class="file-wrapper">
-            <span style="font-size:.9rem;font-weight:500;color:#10b981">Choose AR Video</span>
-            <span class="file-info" id="v-info">No file chosen</span>
-            <input type="file" id="videoFile" accept="video/mp4" required onchange="document.getElementById('v-info').textContent=this.files[0]?this.files[0].name:'No file chosen'">
-          </div>
-        </div>
-      </div>
-
-      <div class="progress-bar" id="p-bar"><div class="progress-fill" id="p-fill"></div></div>
-      <div style="margin-top:1.5rem;text-align:right">
-        <button type="submit" class="btn" id="subBtn">Generate Frame Ecosystem</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="card" style="padding:1.5rem 1rem">
-    <h2>📦 Configured Ecosystems</h2>
-    <div style="overflow-x:auto" id="orders-list">
-      <div class="empty">Loading connected ecosystems...</div>
+    <div class="card" style="overflow:auto">
+      <div class="ctitle">All Orders</div>
+      <div id="orders-list"><div class="empty">No orders yet.</div></div>
     </div>
   </div>
 </div>
 
-<div class="modal" id="qrModal">
-  <div class="modal-card">
-    <button class="close-modal" onclick="closeModal()">×</button>
-    <div class="m-title">Ecosystem Live</div>
-    <p style="font-size:.85rem;color:#94a3b8;margin-top:.3rem">Scan code to launch the active camera scanner</p>
-    <div id="qrcode"></div>
-    <div id="m-link" style="font-family:monospace;font-size:.8rem;background:#1a1a24;padding:.8rem;border-radius:8px;word-break:break-all;color:#94a3b8;border:1px solid #2a2a38"></div>
-    <button class="btn" style="width:100%;margin-top:1.2rem" onclick="copyLink()">Copy URL Path</button>
+<div class="modal" id="qr-modal">
+  <div class="mbox">
+    <div class="mtitle" id="m-name"></div>
+    <div class="msub" id="m-oid"></div>
+    <div id="qrc"></div>
+    <div class="mlink" id="m-link" onclick="copyLink()"></div>
+    <div style="font-size:0.72rem;color:#6b6b82;margin-bottom:10px">📱 Screenshot → send via WhatsApp</div>
+    <button class="mcls" onclick="document.getElementById('qr-modal').classList.remove('open')">Close</button>
   </div>
 </div>
 
 <script>
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
+const CLOUD  = CLOUDINARY_CLOUD;
+const PRESET = CLOUDINARY_PRESET;
 
-function handleAspectChange(){
-  const s=document.getElementById('aspectRatio').value;
-  document.getElementById('customDim').style.display=s==='custom'?'flex':'none';
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const picked = {frame:null, mind:null, video:null};
+let qrLink = '';
+
+function genId(){
+  const d=new Date();
+  return 'ORD'+d.getFullYear().toString().slice(-2)+
+    String(d.getMonth()+1).padStart(2,'0')+
+    String(d.getDate()).padStart(2,'0')+
+    String(d.getHours()).padStart(2,'0')+
+    String(d.getMinutes()).padStart(2,'0')+
+    String(Math.floor(Math.random()*99)+1).padStart(2,'0');
+}
+document.getElementById('f-oid').value = genId();
+
+function onFile(input, key){
+  const f = input.files && input.files[0];
+  if(!f) return;
+  picked[key] = f;
+  const size = f.size > 1048576 ? (f.size/1048576).toFixed(1)+' MB' : (f.size/1024).toFixed(0)+' KB';
+  document.getElementById(key+'-lbl').textContent = f.name + ' ('+size+')';
+  document.getElementById(key+'-lbl').className = 'fname ok';
+  document.getElementById(key+'-row').classList.add('done');
 }
 
-function handleCreateOrder(e){
-  e.preventDefault();
-  const btn=document.getElementById('subBtn');
-  const pBar=document.getElementById('p-bar');
-  const pFill=document.getElementById('p-fill');
-  
-  btn.disabled=true;
-  pBar.style.display='block';
-  pFill.style.width='5%';
+function msg(t,c){const e=document.getElementById('smsg');e.textContent=t;e.className='smsg '+c;e.style.display='block';}
+function prog(p,t){document.getElementById('pbar').style.display='block';document.getElementById('pfill').style.width=p+'%';document.getElementById('plbl').textContent=t;}
 
-  const name=document.getElementById('cName').value;
-  const phone=document.getElementById('cPhone').value;
-  const s=document.getElementById('aspectRatio').value;
-  let targetH=1.0;
-  if(s==='custom') targetH=parseFloat(document.getElementById('cHeight').value)||1;
-  else targetH=parseFloat(s);
-
-  const orderId='MVF'+Math.floor(100000+Math.random()*900000);
-  const pFile=document.getElementById('photoFile').files[0];
-  const vFile=document.getElementById('videoFile').files[0];
-
-  pFill.style.width='15%';
-  
-  // Step 1: Upload Image to ImgBB
-  const fData=new FormData();
-  fData.append('image',pFile);
-  
-  fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,{method:'POST',body:fData})
-  .then(r=>r.json())
-  .then(imgRes=>{
-    if(!imgRes.success) throw new Error('ImgBB host mismatch.');
-    pFill.style.width='40%';
-    
-    // Step 2: Upload Video to Cloudinary
-    const cData=new FormData();
-    cData.append('file',vFile);
-    cData.append('upload_preset',CLOUDINARY_PRESET);
-    
-    return fetch(`https://api.cloudinary.com/1/1/${CLOUDINARY_CLOUD}/video/upload`,{method:'POST',body:cData})
-    .then(r=>r.json())
-    .then(vidRes=>{
-      if(!vidRes.secure_url) throw new Error('Cloudinary node sync fault.');
-      pFill.style.width='80%';
-
-      // Step 3: Call MindAR Compiler proxy engine
-      return fetch('https://compiler.mindar.xyz/api/compile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ images: [imgRes.data.url] })
-      })
-      .then(r => {
-        if(!r.ok) throw new Error('MindAR compiler failed.');
-        return r.blob();
-      })
-      .then(mindBlob => {
-        // Step 4: Upload Compiled Target back to Cloudinary raw storage
-        const mindData = new FormData();
-        mindData.append('file', mindBlob);
-        mindData.append('upload_preset', CLOUDINARY_PRESET);
-        return fetch(`https://api.cloudinary.com/1/1/${CLOUDINARY_CLOUD}/raw/upload`, { method: 'POST', body: mindData });
-      })
-      .then(r => r.json())
-      .then(mindRes => {
-        if(!mindRes.secure_url) throw new Error('Failed to save compiled tracking system.');
-        pFill.style.width='95%';
-
-        // Step 5: Save all links into the new Firebase Node
-        return db.ref('orders/'+orderId).set({
-          orderId,
-          customerName:name,
-          phone,
-          targetHeight:targetH,
-          imgURL:imgRes.data.url,
-          videoURL:vidRes.secure_url,
-          mindURL:mindRes.secure_url,
-          scanCount:0,
-          timestamp:Date.now()
-        });
-      });
-    });
-  })
-  .then(()=>{
-    pFill.style.width='100%';
-    setTimeout(()=>{
-      pBar.style.display='none';
-      pFill.style.width='0%';
-      btn.disabled=false;
-      document.getElementById('orderForm').reset();
-      document.getElementById('p-info').textContent='No file chosen';
-      document.getElementById('v-info').textContent='No file chosen';
-      showModal(orderId);
-    },500);
-  })
-  .catch(err=>{
-    alert('System Link Error: '+err.message);
-    pBar.style.display='none';
-    btn.disabled=false;
+function readFile(f){
+  return new Promise((ok,err)=>{
+    const r=new FileReader();
+    r.onload=()=>ok(r.result);
+    r.onerror=()=>err(new Error('Cannot read file'));
+    r.readAsDataURL(f);
   });
 }
 
-let activeQR=null;
-function showModal(id){
-  const base=window.location.origin+window.location.pathname.replace('admin.html','')+'index.html';
-  const qrLink=base+'?order='+id;
-  document.getElementById('m-link').textContent=qrLink;
-  const qc=document.getElementById('qrcode');
-  qc.innerHTML='';
-  activeQR=new QRCode(qc,{text:qrLink,width:180,height:180,colorDark:'#0a0a0f',colorLight:'#ffffff'});
-  document.getElementById('qrModal').style.display='flex';
+async function imgbb(f){
+  const fd=new FormData();fd.append('image',f);
+  const r=await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_API_KEY,{method:'POST',body:fd});
+  const d=await r.json();
+  if(!d.success)throw new Error('ImgBB: '+JSON.stringify(d));
+  return d.data.url;
 }
 
-function closeModal(){document.getElementById('qrModal').style.display='none'}
+function cloudinary(f){
+  return new Promise((ok,err)=>{
+    const fd=new FormData();
+    fd.append('file',f);
+    fd.append('upload_preset',PRESET);
+    const x=new XMLHttpRequest();
+    x.open('POST','https://api.cloudinary.com/v1_1/'+CLOUD+'/video/upload');
+    x.upload.onprogress=e=>{
+      if(e.lengthComputable)prog(30+Math.round(e.loaded/e.total*55),'Video '+Math.round(e.loaded/e.total*100)+'%');
+    };
+    x.onload=()=>{
+      try{
+        const d=JSON.parse(x.responseText);
+        d.secure_url?ok(d.secure_url):err(new Error(JSON.stringify(d.error||d)));
+      }catch(e){err(e);}
+    };
+    x.onerror=()=>err(new Error('Network error'));
+    x.send(fd);
+  });
+}
+
+async function submitOrder(){
+  const name  = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const oid   = document.getElementById('f-oid').value.trim();
+  if(!name)         {msg('Enter customer name','err');return;}
+  if(!phone)        {msg('Enter phone number','err');return;}
+  if(!picked.frame) {msg('Select frame photo','err');return;}
+  if(!picked.mind)  {msg('Select .mind file','err');return;}
+  if(!picked.video) {msg('Select video file','err');return;}
+
+  document.getElementById('sbtn').disabled=true;
+  try{
+    prog(5,'Uploading frame...');msg('Uploading frame...','ld');
+    const frameURL = await imgbb(picked.frame);
+
+    prog(20,'Reading .mind file...');msg('Reading .mind file...','ld');
+    const mindData = await readFile(picked.mind);
+
+    prog(30,'Uploading video...');msg('Uploading video...','ld');
+    const videoURL = await cloudinary(picked.video);
+
+    prog(88,'Saving order...');msg('Saving order...','ld');
+    await db.ref('orders/'+oid).set({
+      customerName:name, phone, orderId:oid,
+      frameURL, mindFileData:mindData, videoURL,
+      scanCount:0, orderDate:new Date().toISOString(), status:'active'
+    });
+
+    prog(100,'✅ Done!');msg('✅ Order saved!','ok');
+
+    const link=window.location.origin+
+      window.location.pathname.replace('admin.html','')+
+      'index.html?order='+oid;
+    showQR(name,oid,link);
+
+    document.getElementById('f-name').value='';
+    document.getElementById('f-phone').value='';
+    document.getElementById('f-oid').value=genId();
+    ['frame','mind','video'].forEach(k=>{
+      picked[k]=null;
+      document.getElementById(k+'-file').value='';
+      document.getElementById(k+'-lbl').textContent='No file chosen';
+      document.getElementById(k+'-lbl').className='fname';
+      document.getElementById(k+'-row').classList.remove('done');
+    });
+    setTimeout(()=>document.getElementById('pbar').style.display='none',2000);
+  }catch(e){
+    msg('Error: '+e.message,'err');
+    console.error(e);
+    document.getElementById('pbar').style.display='none';
+  }
+  document.getElementById('sbtn').disabled=false;
+}
+
+function showQR(name,oid,link){
+  qrLink=link;
+  document.getElementById('m-name').textContent=name;
+  document.getElementById('m-oid').textContent=oid;
+  document.getElementById('m-link').textContent=link;
+  document.getElementById('qrc').innerHTML='';
+  new QRCode(document.getElementById('qrc'),{text:link,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+  document.getElementById('qr-modal').classList.add('open');
+}
 function copyLink(){
-  navigator.clipboard.writeText(document.getElementById('m-link').textContent);
-  const m=document.getElementById('m-link');
-  m.style.background='#10b981';
-  m.style.color='#fff';
-  setTimeout(()=>{m.style.background='#1a1a24';m.style.color='#94a3b8'},2000);
+  navigator.clipboard.writeText(qrLink);
+  document.getElementById('m-link').textContent='✓ Copied!';
+  setTimeout(()=>document.getElementById('m-link').textContent=qrLink,2000);
 }
 
 db.ref('orders').on('value',snap=>{
   const data=snap.val();
   const c=document.getElementById('orders-list');
   if(!data){
-    c.innerHTML='<div class="empty">No ecosystems configured yet.</div>';
+    c.innerHTML='<div class="empty">No orders yet.</div>';
     document.getElementById('total-orders').textContent='0';
     document.getElementById('total-scans').textContent='0';
     return;
@@ -283,5 +329,23 @@ db.ref('orders').on('value',snap=>{
   document.getElementById('total-orders').textContent=list.length;
   document.getElementById('total-scans').textContent=list.reduce((s,o)=>s+(o.scanCount||0),0);
   const base=window.location.origin+window.location.pathname.replace('admin.html','')+'index.html';
-  let h='<table class=\"htable\"><thead><tr><th>Customer</th><th>Ecosystem ID</th><th>Scans</th><th>Video Asset</th><th>Action</th></tr></thead><tbody>';
-  list.forEach(o=>{\n    const lk=base+'?order='+o.orderId;\n    h+=`<tr>\n      <td><b>${o.customerName}</b><br><span style="font-size:.72rem;color:#6b6b82">${o.phone||'No data'}</span></td>\n      <td style="font-family:monospace;font-size:.75rem;color:#6b6b82">${o.orderId}</td>\n      <td>👁 ${o.scanCount||0}</td>\n      <td>${o.videoURL?'<span style="color:#10b981;font-weight:500">Connected</span>':'❌'}</td>\n      <td>\n        <button class="action-btn" onclick="showModal('${o.orderId}')">🔗 Dispatch QR</button>\n      </td>\n    </tr>`;\n  });\n  h+='</tbody></table>';\n  c.innerHTML=h;\n});\n</script>\n</body>\n</html>\n``` 
+  let h='<table class="htable"><thead><tr><th>Customer</th><th>Order</th><th>Scans</th><th>Video</th><th>Action</th></tr></thead><tbody>';
+  list.forEach(o=>{
+    const lk=base+'?order='+o.orderId;
+    h+=`<tr>
+      <td><b>${o.customerName}</b><br><span style="font-size:.72rem;color:#6b6b82">${o.phone}</span></td>
+      <td style="font-family:monospace;font-size:.75rem;color:#6b6b82">${o.orderId}</td>
+      <td>👁 ${o.scanCount||0}</td>
+      <td>${o.videoURL?'✅':'❌'}</td>
+      <td>
+        <button class="qbtn" onclick="showQR('${o.customerName}','${o.orderId}','${lk}')">QR</button>
+        <button class="dbtn" onclick="if(confirm('Delete?'))db.ref('orders/${o.orderId}').remove()">Del</button>
+      </td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  c.innerHTML=h;
+});
+</script>
+</body>
+</html>
