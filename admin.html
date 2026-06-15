@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magic Video Frame Admin</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#f0f0f8;font-family:'DM Sans',sans-serif;min-height:100vh}
+header{padding:1.2rem 2rem;border-bottom:1px solid #2a2a38;display:flex;align-items:center;justify-content:space-between;background:#13131a}
+.logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(45deg,#10b981,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.container{max-width:1200px;margin:2rem auto;padding:0 1.5rem;display:grid;grid-template-columns:1fr;gap:2rem}
+.card{background:#13131a;border:1px solid #2a2a38;border-radius:16px;padding:2rem;position:relative;overflow:hidden}
+h2{font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1rem}
+.stat-box{background:#1a1a24;padding:1.2rem;border-radius:12px;border:1px solid #2a2a32;text-align:center}
+.stat-box span{display:block;font-size:.85rem;color:#94a3b8;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:0.5px}
+.stat-box b{font-size:1.8rem;font-family:'Syne',sans-serif;color:#10b981}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem}
+@media(max-width:768px){.form-grid{grid-template-columns:1fr}}
+.input-group{display:flex;flex-direction:column;gap:.5rem}
+label{font-size:.88rem;color:#94a3b8;font-weight:500}
+input,select{background:#1a1a24;border:1px solid #2a2a38;padding:.85rem 1rem;border-radius:10px;color:#fff;font-family:inherit;font-size:.95rem;transition:all .2s}
+input:focus,select:focus{outline:none;border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,0.15)}
+.file-wrapper{position:relative;background:#1a1a24;border:2px dashed #3a3a4c;border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.file-wrapper:hover{border-color:#10b981;background:#1d2422}
+.file-wrapper input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-info{font-size:.82rem;color:#808093;word-break:break-all}
+.btn{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;border:none;padding:.9rem 2rem;font-size:1rem;font-weight:600;border-radius:10px;cursor:pointer;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;box-shadow:0 4px 12px rgba(16,185,129,0.2)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(16,185,129,0.3)}
+.btn:disabled{background:#2e2e3a;color:#707085;cursor:not-allowed;transform:none;box-shadow:none}
+.htable{width:100%;border-collapse:collapse;margin-top:1rem;text-align:left}
+.htable th{padding:1rem;color:#94a3b8;font-size:.85rem;text-transform:uppercase;border-bottom:2px solid #2a2a38;font-weight:600}
+.htable td{padding:1.2rem 1rem;border-bottom:1px solid #1f1f2a;font-size:.95rem;vertical-align:middle}
+.htable tr:hover td{background:#161622}
+.action-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e8;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.82rem;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center}
+.action-btn:hover{background:#10b981;border-color:#10b981;color:#fff}
+.modal{position:fixed;inset:0;background:rgba(5,5,8,0.85);backdrop-filter:blur(6px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1.5rem}
+.modal-card{background:#13131a;border:1px solid #2a2a38;border-radius:20px;max-width:440px;width:100%;padding:2rem;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.5);position:relative}
+.close-modal{position:absolute;top:1rem;right:1rem;background:none;border:none;color:#808093;font-size:1.5rem;cursor:pointer}
+#qrcode{display:inline-block;padding:1rem;background:#fff;border-radius:12px;margin:1.5rem 0}
+#qrcode img{margin:0 auto}
+.m-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700}
+.empty{text-align:center;padding:3rem 1rem;color:#6b6b82;font-size:.95rem}
+.progress-bar{width:100%;height:6px;background:#1a1a24;border-radius:3px;margin-top:.8rem;overflow:hidden;display:none}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#10b981,#34d399);transition:width .1s ease}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MAGIC VIDEO FRAME</div>
+  <div style="font-size:.88rem;color:#94a3b8;font-weight:500;">Management Terminal</div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <div class="stats-grid">
+      <div class="stat-box"><span>Active Frames</span><b id="total-orders">0</b></div>
+      <div class="stat-box"><span>Total Scans</span><b id="total-scans">0</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>✨ Create New Interactive Frame</h2>
+    <form id="orderForm" onsubmit="handleCreateOrder(event)">
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Customer Name</label>
+          <input type="text" id="cName" required placeholder="John Doe">
+        </div>
+        <div class="input-group">
+          <label>Phone Number / Remarks</label>
+          <input type="text" id="cPhone" placeholder="+91 98765 43210">
+        </div>
+        <div class="input-group">
+          <label>Target Photo Aspect Ratio</label>
+          <select id="aspectRatio" onchange="handleAspectChange()">
+            <option value="1">Square (1:1)</option>
+            <option value="1.414">Standard Portrait (1:1.41) / A4</option>
+            <option value="0.707">Standard Landscape (1:0.71)</option>
+            <option value="1.5">Classic Photo (4x6 Portrait - 1:1.5)</option>
+            <option value="0.666">Classic Photo (6x4 Landscape - 1:0.66)</option>
+            <option value="custom">Custom Dimensions</option>
+          </select>
+        </div>
+        <div class="input-group" id="customDim" style="display:none">
+          <label>Custom Aspect Ratio (Height divided by Width)</label>
+          <input type="number" id="cHeight" step="0.01" value="1.00" placeholder="e.g. 1.33 for 3:4 portrait">
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div class="input-group">
+          <label>Physical Tracking Image (.jpg or .png)</label>
+          <div class="file-wrapper">
+            <span style="font-size:.9rem;font-weight:500;color:#10b981">Choose Target Photo</span>
+            <span class="file-info" id="p-info">No file chosen</span>
+            <input type="file" id="photoFile" accept="image/jpeg,image/png" required onchange="document.getElementById('p-info').textContent=this.files[0]?this.files[0].name:'No file chosen'">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Overlay Video (.mp4)</label>
+          <div class="file-wrapper">
+            <span style="font-size:.9rem;font-weight:500;color:#10b981">Choose AR Video</span>
+            <span class="file-info" id="v-info">No file chosen</span>
+            <input type="file" id="videoFile" accept="video/mp4" required onchange="document.getElementById('v-info').textContent=this.files[0]?this.files[0].name:'No file chosen'">
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-bar" id="p-bar"><div class="progress-fill" id="p-fill"></div></div>
+      <div style="margin-top:1.5rem;text-align:right">
+        <button type="submit" class="btn" id="subBtn">Generate Frame Ecosystem</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="padding:1.5rem 1rem">
+    <h2>📦 Configured Ecosystems</h2>
+    <div style="overflow-x:auto" id="orders-list">
+      <div class="empty">Loading connected ecosystems...</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="qrModal">
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModal()">×</button>
+    <div class="m-title">Ecosystem Live</div>
+    <p style="font-size:.85rem;color:#94a3b8;margin-top:.3rem">Scan code to launch the active camera scanner</p>
+    <div id="qrcode"></div>
+    <div id="m-link" style="font-family:monospace;font-size:.8rem;background:#1a1a24;padding:.8rem;border-radius:8px;word-break:break-all;color:#94a3b8;border:1px solid #2a2a38"></div>
+    <button class="btn" style="width:100%;margin-top:1.2rem" onclick="copyLink()">Copy URL Path</button>
+  </div>
+</div>
+
+<script>
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+function handleAspectChange(){
+  const s=document.getElementById('aspectRatio').value;
+  document.getElementById('customDim').style.display=s==='custom'?'flex':'none';
+}
+
+function handleCreateOrder(e){
+  e.preventDefault();
+  const btn=document.getElementById('subBtn');
+  const pBar=document.getElementById('p-bar');
+  const pFill=document.getElementById('p-fill');
+  
+  btn.disabled=true;
+  pBar.style.display='block';
+  pFill.style.width='5%';
+
+  const name=document.getElementById('cName').value;
+  const phone=document.getElementById('cPhone').value;
+  const s=document.getElementById('aspectRatio').value;
+  let targetH=1.0;
+  if(s==='custom') targetH=parseFloat(document.getElementById('cHeight').value)||1;
+  else targetH=parseFloat(s);
+
+  const orderId='MVF'+Math.floor(100000+Math.random()*900000);
+  const pFile=document.getElementById('photoFile').files[0];
+  const vFile=document.getElementById('videoFile').files[0];
+
+  pFill.style.width='15%';
+  
+  // Step 1: Upload Image to ImgBB
+  const fData=new FormData();
+  fData.append('image',pFile);
+  
+  fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,{method:'POST',body:fData})
+  .then(r=>r.json())
+  .then(imgRes=>{
+    if(!imgRes.success) throw new Error('ImgBB host mismatch.');
+    pFill.style.width='40%';
+    
+    // Step 2: Upload Video to Cloudinary
+    const cData=new FormData();
+    cData.append('file',vFile);
+    cData.append('upload_preset',CLOUDINARY_PRESET);
+    
+    return fetch(`https://api.cloudinary.com/1/1/${CLOUDINARY_CLOUD}/video/upload`,{method:'POST',body:cData})
+    .then(r=>r.json())
+    .then(vidRes=>{
+      if(!vidRes.secure_url) throw new Error('Cloudinary node sync fault.');
+      pFill.style.width='80%';
+
+      // Step 3: Call MindAR Compiler proxy engine
+      return fetch('https://compiler.mindar.xyz/api/compile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images: [imgRes.data.url] })
+      })
+      .then(r => {
+        if(!r.ok) throw new Error('MindAR compiler failed.');
+        return r.blob();
+      })
+      .then(mindBlob => {
+        // Step 4: Upload Compiled Target back to Cloudinary raw storage
+        const mindData = new FormData();
+        mindData.append('file', mindBlob);
+        mindData.append('upload_preset', CLOUDINARY_PRESET);
+        return fetch(`https://api.cloudinary.com/1/1/${CLOUDINARY_CLOUD}/raw/upload`, { method: 'POST', body: mindData });
+      })
+      .then(r => r.json())
+      .then(mindRes => {
+        if(!mindRes.secure_url) throw new Error('Failed to save compiled tracking system.');
+        pFill.style.width='95%';
+
+        // Step 5: Save all links into the new Firebase Node
+        return db.ref('orders/'+orderId).set({
+          orderId,
+          customerName:name,
+          phone,
+          targetHeight:targetH,
+          imgURL:imgRes.data.url,
+          videoURL:vidRes.secure_url,
+          mindURL:mindRes.secure_url,
+          scanCount:0,
+          timestamp:Date.now()
+        });
+      });
+    });
+  })
+  .then(()=>{
+    pFill.style.width='100%';
+    setTimeout(()=>{
+      pBar.style.display='none';
+      pFill.style.width='0%';
+      btn.disabled=false;
+      document.getElementById('orderForm').reset();
+      document.getElementById('p-info').textContent='No file chosen';
+      document.getElementById('v-info').textContent='No file chosen';
+      showModal(orderId);
+    },500);
+  })
+  .catch(err=>{
+    alert('System Link Error: '+err.message);
+    pBar.style.display='none';
+    btn.disabled=false;
+  });
+}
+
+let activeQR=null;
+function showModal(id){
+  const base=window.location.origin+window.location.pathname.replace('admin.html','')+'index.html';
+  const qrLink=base+'?order='+id;
+  document.getElementById('m-link').textContent=qrLink;
+  const qc=document.getElementById('qrcode');
+  qc.innerHTML='';
+  activeQR=new QRCode(qc,{text:qrLink,width:180,height:180,colorDark:'#0a0a0f',colorLight:'#ffffff'});
+  document.getElementById('qrModal').style.display='flex';
+}
+
+function closeModal(){document.getElementById('qrModal').style.display='none'}
+function copyLink(){
+  navigator.clipboard.writeText(document.getElementById('m-link').textContent);
+  const m=document.getElementById('m-link');
+  m.style.background='#10b981';
+  m.style.color='#fff';
+  setTimeout(()=>{m.style.background='#1a1a24';m.style.color='#94a3b8'},2000);
+}
+
+db.ref('orders').on('value',snap=>{
+  const data=snap.val();
+  const c=document.getElementById('orders-list');
+  if(!data){
+    c.innerHTML='<div class="empty">No ecosystems configured yet.</div>';
+    document.getElementById('total-orders').textContent='0';
+    document.getElementById('total-scans').textContent='0';
+    return;
+  }
+  const list=Object.values(data).reverse();
+  document.getElementById('total-orders').textContent=list.length;
+  document.getElementById('total-scans').textContent=list.reduce((s,o)=>s+(o.scanCount||0),0);
+  const base=window.location.origin+window.location.pathname.replace('admin.html','')+'index.html';
+  let h='<table class=\"htable\"><thead><tr><th>Customer</th><th>Ecosystem ID</th><th>Scans</th><th>Video Asset</th><th>Action</th></tr></thead><tbody>';
+  list.forEach(o=>{\n    const lk=base+'?order='+o.orderId;\n    h+=`<tr>\n      <td><b>${o.customerName}</b><br><span style="font-size:.72rem;color:#6b6b82">${o.phone||'No data'}</span></td>\n      <td style="font-family:monospace;font-size:.75rem;color:#6b6b82">${o.orderId}</td>\n      <td>👁 ${o.scanCount||0}</td>\n      <td>${o.videoURL?'<span style="color:#10b981;font-weight:500">Connected</span>':'❌'}</td>\n      <td>\n        <button class="action-btn" onclick="showModal('${o.orderId}')">🔗 Dispatch QR</button>\n      </td>\n    </tr>`;\n  });\n  h+='</tbody></table>';\n  c.innerHTML=h;\n});\n</script>\n</body>\n</html>\n```

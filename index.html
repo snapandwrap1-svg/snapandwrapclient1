@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Magic Video Frame</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#000;overflow:hidden;font-family:'DM Sans',sans-serif}
+    a-scene{position:fixed!important;top:0;left:0;width:100%!important;height:100%!important}
+    
+    #loading, #start-screen, #err {
+      position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;background:#0d0d13;color:#fff;padding:2rem;text-align:center
+    }
+    #start-screen {
+      background:linear-gradient(135deg, #0f172a 0%, #020617 100%);
+    }
+    .brand {
+      font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;
+      background:linear-gradient(45deg, #10b981, #059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      margin-bottom:0.5rem;letter-spacing:-1px
+    }
+    .tagline{font-size:1rem;color:#94a3b8;margin-bottom:2.5rem}
+    .btn {
+      background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;border:none;
+      padding:1rem 2.5rem;font-size:1.1rem;font-weight:600;border-radius:50px;cursor:pointer;
+      box-shadow:0 10px 25px rgba(16,185,129,0.3);transition:all 0.3s ease;font-family:'DM Sans',sans-serif
+    }
+    .btn:active{transform:scale(0.96);box-shadow:0 5px 10px rgba(16,185,129,0.2)}
+    
+    #brand-corner {
+      position:fixed;top:1.2rem;left:1.2rem;z-index:90;display:none;
+      font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;
+      background:rgba(15,23,42,0.6);padding:0.4rem 1rem;border-radius:20px;backdrop-filter:blur(10px)
+    }
+    #brand-corner span {
+      background:linear-gradient(45deg, #10b981, #059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    
+    #hint {
+      position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);z-index:90;
+      color:#fff;background:rgba(15,23,42,0.7);padding:0.8rem 1.6rem;border-radius:50px;
+      font-size:0.9rem;font-weight:500;pointer-events:none;transition:opacity 0.4s ease;
+      display:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1)
+    }
+    
+    #banner {
+      position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);z-index:100;
+      background:rgba(16,185,129,0.9);color:#fff;padding:0.8rem 2rem;border-radius:50px;
+      font-weight:600;font-size:1.1rem;display:none;box-shadow:0 10px 30px rgba(0,0,0,0.5);
+      animation:pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);backdrop-filter:blur(5px)
+    }
+    @keyframes pop{0%{transform:translate(-50%,-50%) scale(0.7);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+    
+    .spinner {
+      width:45px;height:45px;border:4px solid rgba(16,185,129,0.1);border-left-color:#10b981;
+      border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1.5rem
+    }
+    @keyframes spin{100%{transform:rotate(360deg)}}
+    .hide{opacity:0;transition:opacity 0.5s ease;pointer-events:none}
+  </style>
+  <script>
+    AFRAME.registerComponent('video-cover', {
+      init: function () {
+        this.el.addEventListener('materialtextureloaded', () => {
+          this.updateAspect();
+        });
+      },
+      updateAspect: function () {
+        const mesh = this.el.getObject3D('mesh');
+        if (!mesh || !mesh.material || !mesh.material.map) return;
+        
+        const img = mesh.material.map.image;
+        if (!img) return;
+
+        const videoW = img.videoWidth || img.width;
+        const videoH = img.videoHeight || img.height;
+        if (!videoW || !videoH) return;
+
+        const planeW = parseFloat(this.el.getAttribute('width') || 1);
+        const planeH = parseFloat(this.el.getAttribute('height') || 1);
+
+        const videoAspect = videoW / videoH;
+        const planeAspect = planeW / planeH;
+
+        mesh.material.map.matrixAutoUpdate = false;
+        mesh.material.map.generateMipmaps = false;
+        mesh.material.map.minFilter = THREE.LinearFilter;
+
+        if (videoAspect > planeAspect) {
+          const repeatX = planeAspect / videoAspect;
+          mesh.material.map.repeat.set(repeatX, 1);
+          mesh.material.map.offset.set((1 - repeatX) / 2, 0);
+        } else {
+          const repeatY = videoAspect / planeAspect;
+          mesh.material.map.repeat.set(1, repeatY);
+          mesh.material.map.offset.set(0, (1 - repeatY) / 2);
+        }
+      }
+    });
+  </script>
+</head>
+<body>
+
+  <div id="err" style="display:none;">
+    <div class="brand">Magic Frame</div>
+    <p id="err-txt" style="color:#ef4444;font-weight:500;"></p>
+  </div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <div class="brand" style="font-size:1.8rem">Magic Video Frame</div>
+    <p style="color:#64748b;font-size:0.95rem">Preparing your interactive AR experience...</p>
+  </div>
+
+  <div id="start-screen" style="display:none;">
+    <div class="brand">Magic Video Frame</div>
+    <p class="tagline">Scan your physical frame to unlock the memory</p>
+    <button class="btn" onclick="startAR()">Reveal Magic</button>
+  </div>
+
+  <div id="brand-corner"><span>Magic</span> Frame</div>
+  <div id="banner">✨ Memory Unlocked</div>
+  <div id="hint">Point camera at your physical photo</div>
+
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function getParam(p){
+      return new URLSearchParams(window.location.search).get(p);
+    }
+
+    const orderId = getParam('order');
+    if(!orderId) {
+      showErr("Invalid Link. Please use a valid QR code link containing an order ID.");
+    } else {
+      db.ref('orders/' + orderId).once('value').then(snapshot => {
+        const data = snapshot.val();
+        if(!data) {
+          showErr("Order not found. Please verify your order ID.");
+          return;
+        }
+        if(!data.mindURL || !data.videoURL) {
+          showErr("AR configuration missing for this order. Please complete setup in the dashboard.");
+          return;
+        }
+        initAR(data);
+      }).catch(e => {
+        showErr("Database connection error. Please refresh and try again.");
+      });
+    }
+
+    function showErr(msg) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('err-txt').textContent = msg;
+      document.getElementById('err').style.display = 'flex';
+    }
+
+    let globalMindURL = '';
+    let globalVideoURL = '';
+    let targetPlaneHeight = 1;
+
+    function initAR(data) {
+      globalMindURL = data.mindURL;
+      globalVideoURL = data.videoURL;
+      targetPlaneHeight = data.targetHeight ? parseFloat(data.targetHeight) : 1;
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'flex';
+    }
+
+    function startAR() {
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('loading').style.display = 'flex';
+
+      const assets = document.createElement('a-assets');
+      
+      const video = document.createElement('video');
+      video.setAttribute('id', 'snap-video');
+      video.setAttribute('src', globalVideoURL);
+      video.setAttribute('crossorigin', 'anonymous');
+      video.setAttribute('loop', 'true');
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+      
+      assets.appendChild(video);
+      document.body.appendChild(assets);
+
+      const globalVideo = document.getElementById('snap-video');
+      globalVideo.load();
+
+      const scene = document.createElement('a-scene');
+      scene.setAttribute('mindar-image', `imageTargetSrc: ${globalMindURL}; autoStart: true; filterMinCF:0.0001; filterBeta:0.001;`);
+      scene.setAttribute('embedded', 'true');
+      scene.setAttribute('color-space', 'sRGB');
+      scene.setAttribute('renderer', 'colorManagement: true, physicallyCorrectLights: false');
+      scene.setAttribute('vr-mode-ui', 'enabled: false');
+      scene.setAttribute('device-orientation-permission-ui', 'enabled: false');
+
+      const camera = document.createElement('a-camera');
+      camera.setAttribute('position', '0 0 0');
+      camera.setAttribute('look-controls', 'enabled: false');
+      scene.appendChild(camera);
+
+      const targetEntity = document.createElement('a-entity');
+      targetEntity.setAttribute('mindar-image-target', 'targetIndex: 0');
+
+      const plane = document.createElement('a-plane');
+      plane.setAttribute('position', '0 0 0.001');
+      plane.setAttribute('width', '1');
+      plane.setAttribute('height', targetPlaneHeight.toString());
+      plane.setAttribute('material', 'src: #snap-video; shader: flat; transparent: true');
+      plane.setAttribute('video-cover', ''); 
+
+      targetEntity.appendChild(plane);
+      scene.appendChild(targetEntity);
+      document.body.appendChild(scene);
+
+      scene.addEventListener('arReady', () => {
+        document.getElementById('loading').classList.add('hide');
+        setTimeout(() => {
+          document.getElementById('loading').style.style.display = 'none';
+          document.getElementById('brand-corner').style.display = 'block';
+          document.getElementById('hint').style.display = 'block';
+        }, 500);
+      });
+
+      scene.addEventListener('targetFound', () => {
+        document.getElementById('hint').style.opacity = '0';
+        const b = document.getElementById('banner');
+        b.style.display = 'block';
+        setTimeout(() => b.style.display = 'none', 2500);
+
+        globalVideo.play().catch(e => console.log('Play error:', e));
+        
+        db.ref('orders/' + orderId).transaction(currentData => {
+          if (currentData) {
+            currentData.scanCount = (currentData.scanCount || 0) + 1;
+          }
+          return currentData;
+        });
+      });
+
+      scene.addEventListener('targetLost', () => {
+        document.getElementById('hint').style.opacity = '1';
+        globalVideo.pause();
+      });
+    }
+  </script>
+</body>
+</html>
