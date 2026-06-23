@@ -12,11 +12,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#000;overflow:hidden;font-family:'DM Sans',sans-serif}
+    body{background:#fff7f0;overflow:hidden;font-family:'DM Sans',sans-serif}
     a-scene{position:fixed!important;top:0;left:0;width:100%!important;height:100%!important}
     
     #loading, #start-screen, #err {
-      position:fixed;inset:0;z-index:9999;background:#07070f;
+      position:fixed;inset:0;z-index:9999;background:#fff7f0;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
       text-align:center;padding:2rem;transition:opacity .5s
     }
@@ -25,51 +25,51 @@
     #start-screen { display:none; z-index:10000; }
     #start-btn {
       padding:16px 36px; border-radius:30px; border:none; margin-top:20px;
-      background:linear-gradient(135deg,#7c5cfc,#fc5c7d); color:#fff;
+      background:linear-gradient(135deg,#ff6b00,#ff9a3c); color:#fff;
       font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700;
-      cursor:pointer; box-shadow:0 6px 24px rgba(124,92,252,.4);
+      cursor:pointer; box-shadow:0 6px 24px rgba(255,107,0,.35);
       animation: pulseBtn 2s infinite;
     }
     @keyframes pulseBtn{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
 
     .brand{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;
-      background:linear-gradient(135deg,#7c5cfc,#fc5c7d);
+      background:linear-gradient(135deg,#ff6b00,#ff9a3c);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
-    .tag{font-size:0.78rem;color:#6b6b82;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2rem}
-    .spin{width:44px;height:44px;border:3px solid #22223a;border-top-color:#7c5cfc;
+    .tag{font-size:0.78rem;color:#b35a00;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2rem}
+    .spin{width:44px;height:44px;border:3px solid #ffe0c8;border-top-color:#ff6b00;
       border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 1rem}
     @keyframes sp{to{transform:rotate(360deg)}}
-    #load-txt{font-size:0.85rem;color:#6b6b82}
+    #load-txt{font-size:0.85rem;color:#b35a00}
     
-    #err{display:none;color:#f0f0f8;z-index:10001;}
+    #err{display:none;color:#4a2000;z-index:10001;}
     #err.show{display:flex}
     #err-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:8px}
-    #err-msg{font-size:0.88rem;color:#6b6b82;line-height:1.7;max-width:300px}
+    #err-msg{font-size:0.88rem;color:#b35a00;line-height:1.7;max-width:300px}
 
     #brand-corner{
       position:fixed;top:1rem;left:1rem;z-index:100;
       font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;
-      background:linear-gradient(135deg,#7c5cfc,#fc5c7d);
+      background:linear-gradient(135deg,#ff6b00,#ff9a3c);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
       display:none;pointer-events:none
     }
     #hint{
       position:fixed;bottom:0;left:0;right:0;z-index:100;
       padding:2rem 1.5rem;text-align:center;
-      background:linear-gradient(transparent,rgba(0,0,0,.8));
+      background:linear-gradient(transparent,rgba(255,107,0,.18));
       display:none;pointer-events:none; transition:opacity 0.3s;
     }
-    .pulse{width:54px;height:54px;border:2px solid rgba(124,92,252,.7);
+    .pulse{width:54px;height:54px;border:2px solid rgba(255,107,0,.6);
       border-radius:50%;margin:0 auto 12px;animation:pulse 1.6s ease-out infinite}
     @keyframes pulse{0%{transform:scale(1);opacity:1}100%{transform:scale(1.7);opacity:0}}
-    .h1{font-size:0.9rem;color:rgba(255,255,255,.85);font-weight:500;margin-bottom:4px}
-    .h2{font-size:0.75rem;color:rgba(255,255,255,.45)}
+    .h1{font-size:0.9rem;color:#4a2000;font-weight:500;margin-bottom:4px}
+    .h2{font-size:0.75rem;color:#b35a00}
     #banner{
       position:fixed;top:1rem;left:50%;transform:translateX(-50%);
-      background:linear-gradient(135deg,#7c5cfc,#fc5c7d);
+      background:linear-gradient(135deg,#ff6b00,#ff9a3c);
       padding:8px 22px;border-radius:30px;font-size:0.82rem;
       font-weight:600;z-index:100;display:none;color:#fff;
-      white-space:nowrap;box-shadow:0 4px 24px rgba(124,92,252,.5)
+      white-space:nowrap;box-shadow:0 4px 24px rgba(255,107,0,.4)
     }
   </style>
 
